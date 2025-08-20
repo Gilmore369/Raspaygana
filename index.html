@@ -178,7 +178,8 @@
         if (Object.keys(errs).length === 0) {
           // Intento de enviar a Google Sheets
           try {
-            const scriptURL = 'REEMPLAZAR_CON_URL_DE_GOOGLE_SHEETS';
+            // Reemplazamos la URL del webhook de Google Apps Script con la URL real generada por el despliegue
+            const scriptURL = 'https://script.google.com/macros/s/AKfycbyr1U3bfxSZ3V9eD-WsWyEkSOv2T7MAuNChyWfNVOB4mrs93iS-r08tJ00TykpwrnPp7A/exec';
             await fetch(scriptURL, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
