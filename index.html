@@ -172,8 +172,16 @@
   </div>
 
   <!-- Scratch card overlay -->
+  <!--
+    This overlay contains the digital scratch card and controls. A close button has been
+    added so users can dismiss the overlay at any time. The container is initially
+    hidden and is shown after the form is submitted. Confetti elements are appended
+    here dynamically on reveal.
+  -->
   <div id="scratchCardContainer" class="flex">
     <div class="relative">
+      <!-- Close button to dismiss the scratch card -->
+      <button id="closeScratch" type="button" class="absolute top-1 right-1 text-3xl text-white bg-transparent hover:text-[var(--color-dorado)]" aria-label="Cerrar">&times;</button>
       <canvas id="scratchCanvas" width="300" height="200"></canvas>
       <div id="prizeText"></div>
     </div>
@@ -181,12 +189,19 @@
 
   <script>
     // URL of the Google Apps Script (replace with your own script ID)
+    // Updated to use the user's deployed script. When updating the script in the future,
+    // remember to adjust this constant accordingly.
     const scriptURL = 'https://script.google.com/macros/s/AKfycbz8kDdGXgsm8V_cREA6rT-4YHkxA6A7we8xt1PO2entWAsqC3VEx2hQJivVKo5V301UOA/exec';
 
     const form = document.getElementById('registrationForm');
     const scratchCardContainer = document.getElementById('scratchCardContainer');
     const scratchCanvas = document.getElementById('scratchCanvas');
     const prizeText = document.getElementById('prizeText');
+    const closeScratchButton = document.getElementById('closeScratch');
+    // Maintain lists of used emails and phones in localStorage to prevent duplicate
+    // participation from the same browser. These lists are stored as arrays of strings.
+    const usedEmails = JSON.parse(localStorage.getItem('usedEmails') || '[]');
+    const usedPhones = JSON.parse(localStorage.getItem('usedPhones') || '[]');
     let ctx;
     let isDrawing = false;
     let scratchedArea = 0;
@@ -256,6 +271,13 @@
       event.preventDefault();
       if (!validateForm()) return;
 
+      // Check if email or phone were already used in this browser. If so, prevent new entry.
+      const email = form.email.value.trim();
+      const phone = form.phone.value.trim();
+      if (usedEmails.includes(email) || usedPhones.includes(phone)) {
+        alert('Este correo electrónico o número de celular ya fue registrado desde este navegador. Por favor utiliza datos diferentes.');
+        return;
+      }
       // Choose prize
       const prize = getRandomPrize();
       prizeText.textContent = prize;
@@ -263,8 +285,8 @@
       // Prepare payload
       const formData = {
         name: form.name.value.trim(),
-        email: form.email.value.trim(),
-        phone: form.phone.value.trim(),
+        email: email,
+        phone: phone,
         level: form.level.value,
         career: form.career.value.trim(),
         university: form.university.value.trim(),
@@ -279,6 +301,12 @@
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
         body: JSON.stringify(formData)
       }).catch(err => console.error('Error sending data to Sheets:', err));
+
+      // Update localStorage lists to prevent duplicates from this browser
+      usedEmails.push(email);
+      usedPhones.push(phone);
+      localStorage.setItem('usedEmails', JSON.stringify(usedEmails));
+      localStorage.setItem('usedPhones', JSON.stringify(usedPhones));
 
       // Show scratch card
       scratchCardContainer.style.display = 'flex';
@@ -340,7 +368,7 @@
     // Create confetti pieces falling animation
     function createConfetti() {
       const colors = ['#CFAE63', '#5D001E', '#FFD700', '#FFFFFF'];
-      const pieces = 80;
+      const pieces = 50; // reduce number of pieces to improve performance
       for (let i = 0; i < pieces; i++) {
         const confetti = document.createElement('div');
         confetti.className = 'confetti-piece';
@@ -356,6 +384,13 @@
 
     // Initialize scratch card when page loads
     window.addEventListener('load', initScratchCard);
+
+    // Close button handler: hide overlay and clean up confetti elements
+    closeScratchButton.addEventListener('click', () => {
+      scratchCardContainer.style.display = 'none';
+      // Remove any remaining confetti pieces when closing
+      document.querySelectorAll('.confetti-piece').forEach(elem => elem.remove());
+    });
   </script>
 </body>
 </html>
