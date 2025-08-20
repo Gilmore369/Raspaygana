@@ -43,6 +43,24 @@
       font-weight: bold;
       color: var(--color-vino);
       text-align: center;
+      /* Hide text initially; reveal when scratched enough */
+      opacity: 0;
+    }
+
+    /* Confetti animation */
+    .confetti-piece {
+      position: absolute;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      opacity: 0.8;
+      animation: fall 3s forwards;
+    }
+    @keyframes fall {
+      to {
+        transform: translateY(120vh) rotate(720deg);
+        opacity: 0;
+      }
     }
   </style>
 </head>
@@ -173,6 +191,8 @@
     let isDrawing = false;
     let scratchedArea = 0;
     let totalArea;
+    // Flag to ensure we only reveal once
+    let isRevealed = false;
     const prizes = [
       '10% de descuento',
       '15% de descuento',
@@ -191,6 +211,9 @@
       ctx.globalCompositeOperation = 'destination-out';
       scratchedArea = 0;
       totalArea = scratchCanvas.width * scratchCanvas.height;
+      // Reset reveal flag and hide prize text on new scratch card
+      isRevealed = false;
+      prizeText.style.opacity = 0;
     }
 
     function getRandomPrize() {
@@ -252,7 +275,8 @@
       fetch(scriptURL, {
         method: 'POST',
         mode: 'no-cors',
-        headers: { 'Content-Type': 'application/json' },
+        // Use text/plain to avoid CORS preflight; Apps Script will still parse JSON
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
         body: JSON.stringify(formData)
       }).catch(err => console.error('Error sending data to Sheets:', err));
 
@@ -283,10 +307,50 @@
       ctx.fill();
       // Update scratched area estimate
       scratchedArea += Math.PI * 15 * 15;
-      if (scratchedArea / totalArea > 0.45) {
-        // Reveal completely
+      // If enough area is scratched and not yet revealed
+      if (!isRevealed && scratchedArea / totalArea > 0.45) {
+        isRevealed = true;
+        // Clear overlay
         ctx.clearRect(0, 0, scratchCanvas.width, scratchCanvas.height);
         ctx.globalCompositeOperation = 'source-over';
+        // Show prize text
+        prizeText.style.opacity = 1;
+        // Play victory sound
+        playSound();
+        // Launch confetti animation
+        createConfetti();
+        // Hide scratch card after some seconds
+        setTimeout(() => {
+          scratchCardContainer.style.display = 'none';
+        }, 5000);
+      }
+    }
+
+    // Play a simple victory sound using Web Audio API
+    function playSound() {
+      const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      const oscillator = audioCtx.createOscillator();
+      oscillator.type = 'triangle';
+      oscillator.frequency.setValueAtTime(523.25, audioCtx.currentTime); // C5 note
+      oscillator.connect(audioCtx.destination);
+      oscillator.start();
+      oscillator.stop(audioCtx.currentTime + 0.4);
+    }
+
+    // Create confetti pieces falling animation
+    function createConfetti() {
+      const colors = ['#CFAE63', '#5D001E', '#FFD700', '#FFFFFF'];
+      const pieces = 80;
+      for (let i = 0; i < pieces; i++) {
+        const confetti = document.createElement('div');
+        confetti.className = 'confetti-piece';
+        confetti.style.left = Math.random() * 100 + '%';
+        confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+        confetti.style.animationDelay = (Math.random() * 1.5) + 's';
+        confetti.style.transform = `rotate(${Math.random() * 360}deg)`;
+        scratchCardContainer.appendChild(confetti);
+        // Remove confetti after animation ends
+        confetti.addEventListener('animationend', () => confetti.remove());
       }
     }
 
