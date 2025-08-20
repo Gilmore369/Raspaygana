@@ -3,45 +3,176 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>¡Participa en el Raspa y Gana AKADEMICO!</title>
+  <title>Landing page AKADEMICO</title>
   <!-- Tailwind CSS via CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    /*
-      Configuración de Tailwind para definir la paleta de colores principal.
-      Los tonos vino y dorado reflejan la estética de AKADEMICO.
-    */
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            wine: '#5D001E', // tono de vino
-            gold: '#CFAE63', // tono dorado suave
-            black: '#0A0A0A'
-          }
-        }
-      }
+  <!-- Include custom styles for colours -->
+  <style>
+    :root {
+      --color-vino: #5D001E;
+      --color-dorado: #CFAE63;
+      --color-negro: #0A0A0A;
     }
-  </script>
-  <!-- React y ReactDOM desde CDN -->
-  <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
-  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
-  <!-- Framer Motion para animaciones -->
-  <script src="https://unpkg.com/framer-motion/dist/framer-motion.umd.js"></script>
-  <!-- Babel Standalone para compilar JSX en el navegador -->
-  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    body {
+      background-color: var(--color-negro);
+      color: white;
+    }
+    /* Style for scratch card overlay */
+    #scratchCardContainer {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.8);
+      align-items: center;
+      justify-content: center;
+      z-index: 50;
+    }
+    #scratchCanvas {
+      background-color: #999;
+      border-radius: 8px;
+    }
+    #prizeText {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 2rem;
+      font-weight: bold;
+      color: var(--color-vino);
+      text-align: center;
+    }
+  </style>
 </head>
-<body class="bg-black text-gold flex items-center justify-center min-h-screen p-4">
-  <!-- Punto de montaje de React -->
-  <div id="root" class="w-full"></div>
+<body class="antialiased font-sans">
+  <div class="min-h-screen flex flex-col justify-between">
+    <!-- Header -->
+    <header class="py-8 px-4 text-center bg-[var(--color-vino)]">
+      <h1 class="text-3xl md:text-4xl font-extrabold text-[var(--color-dorado)]">¡Participa en el Raspa y Gana AKADEMICO y descubre tu premio!</h1>
+      <p class="mt-2 text-lg md:text-xl text-white">Regístrate, raspa y obtén descuentos o beneficios exclusivos en nuestros servicios académicos.</p>
+    </header>
 
-  <!-- Usamos el tipo text/babel para que Babel compile el JSX en este script -->
-  <!-- Usamos Babel para compilar JSX. Especificamos los presets de entorno y React -->
-  <script type="text/babel" data-presets="env,react">
-    const { useState, useRef, useEffect } = React;
-    const { motion } = window['framer-motion'];
+    <main class="flex-grow p-4 md:p-8">
+      <!-- Registro y beneficios -->
+      <div class="max-w-4xl mx-auto grid lg:grid-cols-2 gap-8">
+        <!-- Formulario -->
+        <section class="bg-white rounded-lg shadow-lg p-6 text-gray-900">
+          <h2 class="text-xl font-bold mb-4">Regístrate para participar</h2>
+          <form id="registrationForm" class="space-y-4">
+            <div>
+              <label for="name" class="block text-sm font-medium text-gray-700">Nombre completo</label>
+              <input type="text" id="name" name="name" required class="mt-1 block w-full px-3 py-2 bg-gray-100 border border-gray-300 rounded-md" />
+              <p id="nameError" class="text-sm text-red-500 hidden">Ingresa tu nombre completo.</p>
+            </div>
+            <div>
+              <label for="email" class="block text-sm font-medium text-gray-700">Correo electrónico</label>
+              <input type="email" id="email" name="email" required class="mt-1 block w-full px-3 py-2 bg-gray-100 border border-gray-300 rounded-md" />
+              <p id="emailError" class="text-sm text-red-500 hidden">Ingresa un correo válido.</p>
+            </div>
+            <div>
+              <label for="phone" class="block text-sm font-medium text-gray-700">Número de celular</label>
+              <input type="tel" id="phone" name="phone" pattern="\d{9}" required class="mt-1 block w-full px-3 py-2 bg-gray-100 border border-gray-300 rounded-md" />
+              <p id="phoneError" class="text-sm text-red-500 hidden">Ingresa un número de 9 dígitos.</p>
+            </div>
+            <div>
+              <label for="level" class="block text-sm font-medium text-gray-700">Nivel académico</label>
+              <select id="level" name="level" required class="mt-1 block w-full px-3 py-2 bg-gray-100 border border-gray-300 rounded-md">
+                <option value="" disabled selected>Selecciona tu nivel</option>
+                <option value="Pregrado">Pregrado</option>
+                <option value="Posgrado">Posgrado</option>
+                <option value="Doctorado">Doctorado</option>
+                <option value="Otros">Otros</option>
+              </select>
+              <p id="levelError" class="text-sm text-red-500 hidden">Selecciona tu nivel académico.</p>
+            </div>
+            <div>
+              <label for="career" class="block text-sm font-medium text-gray-700">Carrera</label>
+              <input type="text" id="career" name="career" required class="mt-1 block w-full px-3 py-2 bg-gray-100 border border-gray-300 rounded-md" />
+              <p id="careerError" class="text-sm text-red-500 hidden">Ingresa tu carrera.</p>
+            </div>
+            <div>
+              <label for="university" class="block text-sm font-medium text-gray-700">Universidad</label>
+              <input type="text" id="university" name="university" required class="mt-1 block w-full px-3 py-2 bg-gray-100 border border-gray-300 rounded-md" />
+              <p id="universityError" class="text-sm text-red-500 hidden">Ingresa tu universidad.</p>
+            </div>
+            <div>
+              <label for="service" class="block text-sm font-medium text-gray-700">Servicio de interés</label>
+              <select id="service" name="service" required class="mt-1 block w-full px-3 py-2 bg-gray-100 border border-gray-300 rounded-md">
+                <option value="" disabled selected>Selecciona un servicio</option>
+                <option>Asesoría de Tesis</option>
+                <option>Asesoría y realización de Tesis Completa</option>
+                <option>Asesoría y realización de Proyecto de Tesis</option>
+                <option>Asesoría y realización de Informe de Tesis</option>
+                <option>Trabajo académico de segunda especialidad / Suficiencia Profesional</option>
+                <option>Asesoría y realización de Monografía o Artículo</option>
+                <option>Asesoría y realización de Tesinas</option>
+                <option>Revisión sistemática, narrativa y literaria</option>
+                <option>Turnitin</option>
+                <option>Parafraseo</option>
+                <option>Levantamiento de observaciones</option>
+              </select>
+              <p id="serviceError" class="text-sm text-red-500 hidden">Selecciona un servicio de interés.</p>
+            </div>
+            <div class="pt-4">
+              <button type="submit" id="submitButton" class="w-full px-4 py-2 bg-[var(--color-vino)] text-white font-semibold rounded-md hover:bg-[var(--color-dorado)] transition-colors">¡Raspa y gana ahora!</button>
+            </div>
+          </form>
+        </section>
+        <!-- Beneficios -->
+        <section class="space-y-6">
+          <h2 class="text-xl font-bold">Beneficios de AKADEMICO</h2>
+          <p>Acompañamiento especializado, cumplimiento estricto con normas académicas y resultados garantizados en cada entrega.</p>
+          <div class="grid grid-cols-2 gap-4">
+            <div class="bg-[var(--color-vino)] rounded-lg p-4 flex items-center">
+              <img src="books.png" alt="Libros" class="w-12 h-12 mr-4" />
+              <p>Amplia biblioteca de recursos.</p>
+            </div>
+            <div class="bg-[var(--color-vino)] rounded-lg p-4 flex items-center">
+              <img src="graduation_cap.png" alt="Birrete" class="w-12 h-12 mr-4" />
+              <p>Expertos con experiencia académica.</p>
+            </div>
+            <div class="bg-[var(--color-vino)] rounded-lg p-4 flex items-center">
+              <img src="magic_wand.png" alt="Varita mágica" class="w-12 h-12 mr-4" />
+              <p>Soluciones hechas a medida.</p>
+            </div>
+            <div class="bg-[var(--color-vino)] rounded-lg p-4 flex items-center">
+              <img src="dinosaur.png" alt="Dinosaurio académico" class="w-12 h-12 mr-4" />
+              <p>Tradición y confianza académica.</p>
+            </div>
+          </div>
+          <p class="mt-4 font-semibold">Completa tu registro, raspa y gana tu beneficio. Con AKADEMICO, tu investigación avanza con calidad y respaldo académico.</p>
+        </section>
+      </div>
+    </main>
 
-    // Lista de premios configurables según lo solicitado
+    <!-- Footer -->
+    <footer class="py-4 text-center text-sm text-gray-400 bg-[var(--color-vino)]">
+      © 2025 AKADEMICO – Todos los derechos reservados
+    </footer>
+  </div>
+
+  <!-- Scratch card overlay -->
+  <div id="scratchCardContainer" class="flex">
+    <div class="relative">
+      <canvas id="scratchCanvas" width="300" height="200"></canvas>
+      <div id="prizeText"></div>
+    </div>
+  </div>
+
+  <script>
+    // URL of the Google Apps Script (replace with your own script ID)
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbyr1U3bfxSZ3V9eD-WsWyEkSOv2T7MAuNChyWfNVOB4mrs93iS-r08tJ00TykpwrnPp7A/exec';
+
+    const form = document.getElementById('registrationForm');
+    const scratchCardContainer = document.getElementById('scratchCardContainer');
+    const scratchCanvas = document.getElementById('scratchCanvas');
+    const prizeText = document.getElementById('prizeText');
+    let ctx;
+    let isDrawing = false;
+    let scratchedArea = 0;
+    let totalArea;
     const prizes = [
       '10% de descuento',
       '15% de descuento',
@@ -51,323 +182,116 @@
       '25% de descuento en un servicio completo'
     ];
 
-    /**
-     * Componente ScratchCard
-     * Renderiza un canvas interactivo que permite raspar para descubrir un premio.
-     * Utiliza la técnica de dibujar círculos en modo destination-out para "borrar"
-     * el recubrimiento gris. Al raspar más del 45 % del área, se dispara onComplete.
-     */
-    function ScratchCard({ onComplete, prize }) {
-      const canvasRef = useRef(null);
-      const [scratched, setScratched] = useState(false);
-
-      useEffect(() => {
-        const canvas = canvasRef.current;
-        const ctx = canvas.getContext('2d');
-        const rect = canvas.getBoundingClientRect();
-        const width = rect.width;
-        const height = rect.height;
-        // Establecer dimensiones internas del canvas
-        canvas.width = width;
-        canvas.height = height;
-        // Capa gris inicial
-        ctx.fillStyle = '#999999';
-        ctx.fillRect(0, 0, width, height);
-        // Cambiar modo de composición para borrar
-        ctx.globalCompositeOperation = 'destination-out';
-
-        let scratchedArea = 0;
-        const totalArea = width * height;
-
-        function scratch(e) {
-          // Obtener coordenadas relativas al canvas
-          const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-          const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-          const x = clientX - rect.left;
-          const y = clientY - rect.top;
-          // Dibujar círculo para raspar
-          ctx.beginPath();
-          const radius = 20;
-          ctx.arc(x, y, radius, 0, Math.PI * 2, false);
-          ctx.fill();
-          // Incrementar área raspada (aproximada)
-          scratchedArea += Math.PI * radius * radius;
-          // Si ya se raspó suficiente, disparar onComplete
-          if (!scratched && scratchedArea / totalArea > 0.45) {
-            setScratched(true);
-            onComplete();
-          }
-        }
-
-        // Eventos de mouse
-        const handleMouseDown = (e) => {
-          scratch(e);
-          canvas.addEventListener('mousemove', scratch);
-        };
-        const handleMouseUp = () => {
-          canvas.removeEventListener('mousemove', scratch);
-        };
-        canvas.addEventListener('mousedown', handleMouseDown);
-        window.addEventListener('mouseup', handleMouseUp);
-        // Eventos táctiles
-        canvas.addEventListener('touchstart', scratch);
-        canvas.addEventListener('touchmove', scratch);
-
-        return () => {
-          canvas.removeEventListener('mousedown', handleMouseDown);
-          window.removeEventListener('mouseup', handleMouseUp);
-          canvas.removeEventListener('mousemove', scratch);
-          canvas.removeEventListener('touchstart', scratch);
-          canvas.removeEventListener('touchmove', scratch);
-        };
-      }, [scratched, onComplete]);
-
-      return (
-        <div className="relative w-full h-40 md:h-56 mt-4 md:mt-8">
-          {/* Premio visible debajo de la capa de raspar */}
-          <div className="absolute inset-0 flex items-center justify-center bg-wine text-gold font-semibold text-lg md:text-2xl p-4 rounded-lg">
-            {prize}
-          </div>
-          <canvas
-            ref={canvasRef}
-            className="absolute inset-0 w-full h-full rounded-lg cursor-pointer"
-          />
-        </div>
-      );
+    // Initialize scratch card canvas
+    function initScratchCard() {
+      ctx = scratchCanvas.getContext('2d');
+      // Fill with gray overlay
+      ctx.fillStyle = '#B0B0B0';
+      ctx.fillRect(0, 0, scratchCanvas.width, scratchCanvas.height);
+      ctx.globalCompositeOperation = 'destination-out';
+      scratchedArea = 0;
+      totalArea = scratchCanvas.width * scratchCanvas.height;
     }
 
-    /**
-     * Componente principal de la aplicación
-     * Gestiona el formulario, la validación, el envío a Google Sheets y la aparición de la tarjeta de raspar.
-     */
-    function App() {
-      const [formData, setFormData] = useState({
-        nombre: '',
-        correo: '',
-        celular: '',
-        nivel: '',
-        carrera: '',
-        universidad: '',
-        servicio: ''
-      });
-      const [errors, setErrors] = useState({});
-      const [submitted, setSubmitted] = useState(false);
-      const [prize, setPrize] = useState('');
-
-      // Manejar cambios en los campos del formulario
-      const handleChange = (e) => {
-        setFormData({ ...formData, [e.target.name]: e.target.value });
-      };
-
-      // Validación de los campos
-      const validate = () => {
-        const errs = {};
-        if (!formData.nombre.trim()) errs.nombre = 'Ingrese su nombre completo';
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailRegex.test(formData.correo)) errs.correo = 'Correo electrónico inválido';
-        const phoneRegex = /^\d{9}$/;
-        if (!phoneRegex.test(formData.celular)) errs.celular = 'El número debe tener 9 dígitos';
-        if (!formData.nivel) errs.nivel = 'Seleccione su nivel académico';
-        if (!formData.carrera.trim()) errs.carrera = 'Ingrese su carrera';
-        if (!formData.universidad.trim()) errs.universidad = 'Ingrese su universidad';
-        if (!formData.servicio) errs.servicio = 'Seleccione un servicio de interés';
-        return errs;
-      };
-
-      // Envío del formulario
-      const handleSubmit = async (e) => {
-        e.preventDefault();
-        const errs = validate();
-        setErrors(errs);
-        if (Object.keys(errs).length === 0) {
-          // Intento de enviar a Google Sheets
-          try {
-            // Reemplazamos la URL del webhook de Google Apps Script con la URL real generada por el despliegue
-            const scriptURL = 'https://script.google.com/macros/s/AKfycbyr1U3bfxSZ3V9eD-WsWyEkSOv2T7MAuNChyWfNVOB4mrs93iS-r08tJ00TykpwrnPp7A/exec';
-            await fetch(scriptURL, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify(formData)
-            });
-          } catch (err) {
-            console.error(err);
-          }
-          // Seleccionar un premio aleatorio
-          const randomPrize = prizes[Math.floor(Math.random() * prizes.length)];
-          setPrize(randomPrize);
-          setSubmitted(true);
-        }
-      };
-
-      return (
-        <div className="max-w-4xl w-full mx-auto bg-wine text-gold rounded-xl shadow-lg p-4 md:p-8 space-y-6">
-          {/* Encabezado principal */}
-          <div className="text-center">
-            <motion.h1
-              initial={{ opacity: 0, y: -20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
-              className="text-2xl md:text-4xl font-bold mb-2"
-            >
-              ¡Participa en el Raspa y Gana AKADEMICO y descubre tu premio!
-            </motion.h1>
-            <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8 }}
-              className="text-base md:text-lg"
-            >
-              Regístrate, raspa y obtén descuentos o beneficios exclusivos en nuestros servicios académicos.
-            </motion.p>
-          </div>
-
-          <div className="grid md:grid-cols-2 gap-6">
-            {/* Sección de beneficios con iconos */}
-            <div className="grid grid-cols-2 gap-4">
-              <div className="bg-black rounded-lg p-4 flex flex-col items-center justify-center">
-                { /* Imagen de libros */ }
-                <img src="books.png" alt="Libros" className="w-16 h-16 mb-2" />
-                <p className="text-center text-sm">Acompañamiento especializado</p>
-              </div>
-              <div className="bg-black rounded-lg p-4 flex flex-col items-center justify-center">
-                { /* Imagen de graduación */ }
-                <img src="graduation_cap.png" alt="Graduación" className="w-16 h-16 mb-2" />
-                <p className="text-center text-sm">Cumplimiento con normas académicas</p>
-              </div>
-              <div className="bg-black rounded-lg p-4 flex flex-col items-center justify-center">
-                { /* Imagen de varita mágica */ }
-                <img src="magic_wand.png" alt="Varita mágica" className="w-16 h-16 mb-2" />
-                <p className="text-center text-sm">Resultados garantizados</p>
-              </div>
-              <div className="bg-black rounded-lg p-4 flex flex-col items-center justify-center">
-                { /* Imagen de dinosaurio académico */ }
-                <img src="dinosaur.png" alt="Dinosaurio académico" className="w-16 h-16 mb-2" />
-                <p className="text-center text-sm">¡Experiencia mágica!</p>
-              </div>
-            </div>
-
-            {/* Formulario o tarjeta de raspar según el estado */}
-            {!submitted ? (
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <div>
-                  <input
-                    type="text"
-                    name="nombre"
-                    placeholder="Nombre completo"
-                    value={formData.nombre}
-                    onChange={handleChange}
-                    className="w-full p-2 rounded-lg bg-black text-gold placeholder-gold/60 focus:outline-none"
-                  />
-                  {errors.nombre && <p className="text-red-400 text-sm">{errors.nombre}</p>}
-                </div>
-                <div>
-                  <input
-                    type="email"
-                    name="correo"
-                    placeholder="Correo electrónico"
-                    value={formData.correo}
-                    onChange={handleChange}
-                    className="w-full p-2 rounded-lg bg-black text-gold placeholder-gold/60 focus:outline-none"
-                  />
-                  {errors.correo && <p className="text-red-400 text-sm">{errors.correo}</p>}
-                </div>
-                <div>
-                  <input
-                    type="tel"
-                    name="celular"
-                    placeholder="Número de celular (9 dígitos)"
-                    value={formData.celular}
-                    onChange={handleChange}
-                    className="w-full p-2 rounded-lg bg-black text-gold placeholder-gold/60 focus:outline-none"
-                  />
-                  {errors.celular && <p className="text-red-400 text-sm">{errors.celular}</p>}
-                </div>
-                <div>
-                  <select
-                    name="nivel"
-                    value={formData.nivel}
-                    onChange={handleChange}
-                    className="w-full p-2 rounded-lg bg-black text-gold focus:outline-none"
-                  >
-                    <option value="">Nivel académico</option>
-                    <option value="Pregrado">Pregrado</option>
-                    <option value="Posgrado">Posgrado</option>
-                    <option value="Doctorado">Doctorado</option>
-                    <option value="Otros">Otros</option>
-                  </select>
-                  {errors.nivel && <p className="text-red-400 text-sm">{errors.nivel}</p>}
-                </div>
-                <div>
-                  <input
-                    type="text"
-                    name="carrera"
-                    placeholder="Carrera (ej: Ingeniería Industrial)"
-                    value={formData.carrera}
-                    onChange={handleChange}
-                    className="w-full p-2 rounded-lg bg-black text-gold placeholder-gold/60 focus:outline-none"
-                  />
-                  {errors.carrera && <p className="text-red-400 text-sm">{errors.carrera}</p>}
-                </div>
-                <div>
-                  <input
-                    type="text"
-                    name="universidad"
-                    placeholder="Universidad (ej: UPAO)"
-                    value={formData.universidad}
-                    onChange={handleChange}
-                    className="w-full p-2 rounded-lg bg-black text-gold placeholder-gold/60 focus:outline-none"
-                  />
-                  {errors.universidad && <p className="text-red-400 text-sm">{errors.universidad}</p>}
-                </div>
-                <div>
-                  <select
-                    name="servicio"
-                    value={formData.servicio}
-                    onChange={handleChange}
-                    className="w-full p-2 rounded-lg bg-black text-gold focus:outline-none"
-                  >
-                    <option value="">Servicio de interés</option>
-                    <option value="Asesoría de Tesis">Asesoría de Tesis</option>
-                    <option value="Asesoría y realización de Tesis Completa">Asesoría y realización de Tesis Completa</option>
-                    <option value="Asesoría y realización de Proyecto de Tesis">Asesoría y realización de Proyecto de Tesis</option>
-                    <option value="Asesoría y realización de Informe de Tesis">Asesoría y realización de Informe de Tesis</option>
-                    <option value="Trabajo académico de segunda especialidad / Suficiencia Profesional">Trabajo académico de segunda especialidad / Suficiencia Profesional</option>
-                    <option value="Asesoría y realización de Monografía o Artículo">Asesoría y realización de Monografía o Artículo</option>
-                    <option value="Asesoría y realización de Tesinas">Asesoría y realización de Tesinas</option>
-                    <option value="Revisión sistemática, narrativa y literaria">Revisión sistemática, narrativa y literaria</option>
-                    <option value="Turnitin">Turnitin</option>
-                    <option value="Parafraseo">Parafraseo</option>
-                    <option value="Levantamiento de observaciones">Levantamiento de observaciones</option>
-                  </select>
-                  {errors.servicio && <p className="text-red-400 text-sm">{errors.servicio}</p>}
-                </div>
-                <button
-                  type="submit"
-                  className="w-full bg-gold text-wine font-bold py-3 rounded-lg hover:bg-yellow-500 transition-colors"
-                >
-                  ¡Raspa y gana ahora!
-                </button>
-              </form>
-            ) : (
-              <div className="flex flex-col items-center">
-                <p className="text-lg md:text-xl mb-2">¡Ahora raspa para descubrir tu premio!</p>
-                <ScratchCard prize={prize} onComplete={() => {}} />
-                <p className="mt-4 text-sm">¡Gracias por participar! Nos pondremos en contacto contigo pronto.</p>
-              </div>
-            )}
-          </div>
-
-          <div className="text-center pt-4 border-t border-gold/30">
-            <p className="text-base md:text-lg">
-              Completa tu registro, raspa y gana tu beneficio. Con AKADEMICO, tu investigación avanza con calidad y respaldo académico.
-            </p>
-          </div>
-        </div>
-      );
+    function getRandomPrize() {
+      return prizes[Math.floor(Math.random() * prizes.length)];
     }
 
-    // Montar la aplicación
-    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+    // Validate fields and show error messages
+    function validateForm() {
+      let valid = true;
+      // Helper to show/hide errors
+      function toggleError(id, show) {
+        document.getElementById(id).classList.toggle('hidden', !show);
+      }
+      const name = form.name.value.trim();
+      const email = form.email.value.trim();
+      const phone = form.phone.value.trim();
+      const level = form.level.value;
+      const career = form.career.value.trim();
+      const university = form.university.value.trim();
+      const service = form.service.value;
+      // Validate name
+      if (!name) { toggleError('nameError', true); valid = false; } else { toggleError('nameError', false); }
+      // Validate email with simple regex
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) { toggleError('emailError', true); valid = false; } else { toggleError('emailError', false); }
+      // Validate phone: 9 digits
+      if (!/^\d{9}$/.test(phone)) { toggleError('phoneError', true); valid = false; } else { toggleError('phoneError', false); }
+      // Validate level
+      if (!level) { toggleError('levelError', true); valid = false; } else { toggleError('levelError', false); }
+      // Validate career
+      if (!career) { toggleError('careerError', true); valid = false; } else { toggleError('careerError', false); }
+      // Validate university
+      if (!university) { toggleError('universityError', true); valid = false; } else { toggleError('universityError', false); }
+      // Validate service
+      if (!service) { toggleError('serviceError', true); valid = false; } else { toggleError('serviceError', false); }
+      return valid;
+    }
+
+    form.addEventListener('submit', function(event) {
+      event.preventDefault();
+      if (!validateForm()) return;
+
+      // Choose prize
+      const prize = getRandomPrize();
+      prizeText.textContent = prize;
+
+      // Prepare payload
+      const formData = {
+        name: form.name.value.trim(),
+        email: form.email.value.trim(),
+        phone: form.phone.value.trim(),
+        level: form.level.value,
+        career: form.career.value.trim(),
+        university: form.university.value.trim(),
+        service: form.service.value,
+        prize: prize
+      };
+      // Send to Google Sheets
+      fetch(scriptURL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData)
+      }).catch(err => console.error('Error sending data to Sheets:', err));
+
+      // Show scratch card
+      scratchCardContainer.style.display = 'flex';
+      initScratchCard();
+    });
+
+    // Scratch card events
+    function getCanvasPos(e) {
+      const rect = scratchCanvas.getBoundingClientRect();
+      const x = (e.touches ? e.touches[0].clientX : e.clientX) - rect.left;
+      const y = (e.touches ? e.touches[0].clientY : e.clientY) - rect.top;
+      return { x, y };
+    }
+
+    scratchCanvas.addEventListener('mousedown', e => { isDrawing = true; scratch(e); });
+    scratchCanvas.addEventListener('touchstart', e => { isDrawing = true; scratch(e); });
+    window.addEventListener('mouseup', () => { isDrawing = false; });
+    window.addEventListener('touchend', () => { isDrawing = false; });
+    scratchCanvas.addEventListener('mousemove', e => { if (isDrawing) scratch(e); });
+    scratchCanvas.addEventListener('touchmove', e => { if (isDrawing) scratch(e); });
+
+    function scratch(e) {
+      const pos = getCanvasPos(e);
+      ctx.beginPath();
+      ctx.arc(pos.x, pos.y, 15, 0, Math.PI * 2);
+      ctx.fill();
+      // Update scratched area estimate
+      scratchedArea += Math.PI * 15 * 15;
+      if (scratchedArea / totalArea > 0.45) {
+        // Reveal completely
+        ctx.clearRect(0, 0, scratchCanvas.width, scratchCanvas.height);
+        ctx.globalCompositeOperation = 'source-over';
+      }
+    }
+
+    // Initialize scratch card when page loads
+    window.addEventListener('load', initScratchCard);
   </script>
 </body>
 </html>
