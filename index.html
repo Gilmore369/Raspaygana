@@ -1,66 +1,36 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Landing page AKADEMICO</title>
+
   <!-- Tailwind CSS via CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Include custom styles for colours -->
+
+  <!-- GSAP -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" referrerpolicy="no-referrer"></script>
+
   <style>
-    :root {
-      --color-vino: #5D001E;
-      --color-dorado: #CFAE63;
-      --color-negro: #0A0A0A;
-    }
-    body {
-      background-color: var(--color-negro);
-      color: white;
-    }
-    /* Style for scratch card overlay */
+    :root { --color-vino:#5D001E; --color-dorado:#CFAE63; --color-negro:#0A0A0A; }
+    body { background-color: var(--color-negro); color: white; }
+
+    /* Overlay scratch */
     #scratchCardContainer {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.8);
-      align-items: center;
-      justify-content: center;
-      z-index: 50;
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,0.8); align-items: center; justify-content: center; z-index: 50;
     }
-    #scratchCanvas {
-      background-color: #999;
-      border-radius: 8px;
-    }
+    #modalCard { position: relative; }
+    #scratchCanvas { background-color: #b8b8b8; border-radius: 12px; touch-action: none; }
     #prizeText {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      font-size: 2rem;
-      font-weight: bold;
-      color: var(--color-vino);
-      text-align: center;
-      /* Hide text initially; reveal when scratched enough */
-      opacity: 0;
+      position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+      font-size: 2rem; font-weight: 800; color: var(--color-vino); text-align: center; opacity: 0;
+      padding: .5rem;
     }
 
-    /* Confetti animation */
+    /* Confeti (GSAP animará transform/opacity/translate) */
     .confetti-piece {
-      position: absolute;
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      opacity: 0.8;
-      animation: fall 3s forwards;
-    }
-    @keyframes fall {
-      to {
-        transform: translateY(120vh) rotate(720deg);
-        opacity: 0;
-      }
+      position: absolute; width: 8px; height: 12px; border-radius: 2px; will-change: transform, opacity;
     }
   </style>
 </head>
@@ -73,7 +43,6 @@
     </header>
 
     <main class="flex-grow p-4 md:p-8">
-      <!-- Registro y beneficios -->
       <div class="max-w-4xl mx-auto grid lg:grid-cols-2 gap-8">
         <!-- Formulario -->
         <section class="bg-white rounded-lg shadow-lg p-6 text-gray-900">
@@ -138,27 +107,16 @@
             </div>
           </form>
         </section>
+
         <!-- Beneficios -->
         <section class="space-y-6">
           <h2 class="text-xl font-bold">Beneficios de AKADEMICO</h2>
           <p>Acompañamiento especializado, cumplimiento estricto con normas académicas y resultados garantizados en cada entrega.</p>
           <div class="grid grid-cols-2 gap-4">
-            <div class="bg-[var(--color-vino)] rounded-lg p-4 flex items-center">
-              <img src="books.png" alt="Libros" class="w-12 h-12 mr-4" />
-              <p>Amplia biblioteca de recursos.</p>
-            </div>
-            <div class="bg-[var(--color-vino)] rounded-lg p-4 flex items-center">
-              <img src="graduation_cap.png" alt="Birrete" class="w-12 h-12 mr-4" />
-              <p>Expertos con experiencia académica.</p>
-            </div>
-            <div class="bg-[var(--color-vino)] rounded-lg p-4 flex items-center">
-              <img src="magic_wand.png" alt="Varita mágica" class="w-12 h-12 mr-4" />
-              <p>Soluciones hechas a medida.</p>
-            </div>
-            <div class="bg-[var(--color-vino)] rounded-lg p-4 flex items-center">
-              <img src="dinosaur.png" alt="Dinosaurio académico" class="w-12 h-12 mr-4" />
-              <p>Tradición y confianza académica.</p>
-            </div>
+            <div class="bg-[var(--color-vino)] rounded-lg p-4 flex items-center">📚 <p class="ml-3">Amplia biblioteca de recursos.</p></div>
+            <div class="bg-[var(--color-vino)] rounded-lg p-4 flex items-center">🎓 <p class="ml-3">Expertos con experiencia académica.</p></div>
+            <div class="bg-[var(--color-vino)] rounded-lg p-4 flex items-center">🪄 <p class="ml-3">Soluciones hechas a medida.</p></div>
+            <div class="bg-[var(--color-vino)] rounded-lg p-4 flex items-center">🦖 <p class="ml-3">Tradición y confianza académica.</p></div>
           </div>
           <p class="mt-4 font-semibold">Completa tu registro, raspa y gana tu beneficio. Con AKADEMICO, tu investigación avanza con calidad y respaldo académico.</p>
         </section>
@@ -172,76 +130,165 @@
   </div>
 
   <!-- Scratch card overlay -->
-  <!--
-    This overlay contains the digital scratch card and controls. A close button has been
-    added so users can dismiss the overlay at any time. The container is initially
-    hidden and is shown after the form is submitted. Confetti elements are appended
-    here dynamically on reveal.
-  -->
   <div id="scratchCardContainer" class="flex">
-    <div class="relative">
-      <!-- Close button to dismiss the scratch card -->
-      <button id="closeScratch" type="button" class="absolute top-1 right-1 text-3xl text-white bg-transparent hover:text-[var(--color-dorado)]" aria-label="Cerrar">&times;</button>
-      <canvas id="scratchCanvas" width="300" height="200"></canvas>
-      <div id="prizeText"></div>
+    <div id="modalCard" class="bg-white rounded-2xl shadow-2xl p-4 md:p-6">
+      <div class="flex justify-end">
+        <button id="closeScratchButton" class="text-[var(--color-vino)] font-semibold px-3 py-1 rounded hover:text-black">✕ Cerrar</button>
+      </div>
+      <div class="relative">
+        <canvas id="scratchCanvas" width="320" height="220"></canvas>
+        <div id="prizeText"></div>
+      </div>
+      <p class="text-center text-sm text-gray-600 mt-3">¡Raspa hasta revelar tu premio!</p>
     </div>
   </div>
 
+  <!-- Audio de aplausos (sube aplausos.mp3 a tu repo). Si no existe, habrá beep de respaldo. -->
+  <audio id="aplausos" src="aplausos.mp3" preload="auto"></audio>
+
   <script>
-    // URL of the Google Apps Script (replace with your own script ID)
-    // Updated to use the user's deployed script. When updating the script in the future,
-    // remember to adjust this constant accordingly.
+    // URL de Apps Script (tu /exec actual)
     const scriptURL = 'https://script.google.com/macros/s/AKfycbz8kDdGXgsm8V_cREA6rT-4YHkxA6A7we8xt1PO2entWAsqC3VEx2hQJivVKo5V301UOA/exec';
 
     const form = document.getElementById('registrationForm');
     const scratchCardContainer = document.getElementById('scratchCardContainer');
     const scratchCanvas = document.getElementById('scratchCanvas');
     const prizeText = document.getElementById('prizeText');
-    const closeScratchButton = document.getElementById('closeScratch');
-    // Maintain lists of used emails and phones in localStorage to prevent duplicate
-    // participation from the same browser. These lists are stored as arrays of strings.
-    const usedEmails = JSON.parse(localStorage.getItem('usedEmails') || '[]');
-    const usedPhones = JSON.parse(localStorage.getItem('usedPhones') || '[]');
-    let ctx;
-    let isDrawing = false;
-    let scratchedArea = 0;
-    let totalArea;
-    // Flag to ensure we only reveal once
-    let isRevealed = false;
+    const closeBtn = document.getElementById('closeScratchButton');
+    const applauseAudio = document.getElementById('aplausos');
+
+    // Estado
+    let ctx, isDrawing = false, scratchedArea = 0, totalArea, isRevealed = false, lastPos = null;
+
     const prizes = [
-      '10% de descuento',
-      '15% de descuento',
-      '20% de descuento',
-      'Asesoría gratis de 30 minutos',
-      'Plantilla premium de tesis gratis',
+      '10% de descuento','15% de descuento','20% de descuento',
+      'Asesoría gratis de 30 minutos','Plantilla premium de tesis gratis',
       '25% de descuento en un servicio completo'
     ];
+    function getRandomPrize(){ return prizes[Math.floor(Math.random()*prizes.length)]; }
 
-    // Initialize scratch card canvas
-    function initScratchCard() {
-      ctx = scratchCanvas.getContext('2d');
-      // Fill with gray overlay
+    // ===== Animaciones GSAP =====
+    function openOverlay(){
+      scratchCardContainer.style.display = 'flex';
+      gsap.fromTo('#scratchCardContainer',{opacity:0},{opacity:1,duration:0.25,ease:'power1.out'});
+      gsap.fromTo('#modalCard',{y:40,scale:.95,opacity:0},{y:0,scale:1,opacity:1,duration:.35,ease:'power3.out'});
+    }
+    function closeOverlay(){
+      gsap.timeline()
+        .to('#modalCard',{y:20,scale:.98,opacity:0,duration:.2,ease:'power2.in'})
+        .to('#scratchCardContainer',{opacity:0,duration:.2,onComplete:()=>{
+          scratchCardContainer.style.display='none';
+          // limpiar confeti remanente
+          document.querySelectorAll('.confetti-piece').forEach(el=>el.remove());
+        }});
+    }
+    closeBtn.addEventListener('click', closeOverlay);
+
+    // ===== Scratch optimizado (líneas, menos lag) =====
+    function initScratchCard(){
+      ctx = scratchCanvas.getContext('2d',{willReadFrequently:false});
+      ctx.globalCompositeOperation = 'source-over';
       ctx.fillStyle = '#B0B0B0';
-      ctx.fillRect(0, 0, scratchCanvas.width, scratchCanvas.height);
-      ctx.globalCompositeOperation = 'destination-out';
+      ctx.fillRect(0,0,scratchCanvas.width,scratchCanvas.height);
+      ctx.globalCompositeOperation = 'destination-out'; // lo que pintes, “borra”
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+      ctx.lineWidth = 28; // trazo ancho = menos llamadas
       scratchedArea = 0;
       totalArea = scratchCanvas.width * scratchCanvas.height;
-      // Reset reveal flag and hide prize text on new scratch card
       isRevealed = false;
       prizeText.style.opacity = 0;
+      lastPos = null;
     }
 
-    function getRandomPrize() {
-      return prizes[Math.floor(Math.random() * prizes.length)];
+    function getCanvasPos(e){
+      const rect = scratchCanvas.getBoundingClientRect();
+      const p = e.touches ? e.touches[0] : e;
+      return { x: p.clientX - rect.left, y: p.clientY - rect.top };
     }
 
-    // Validate fields and show error messages
-    function validateForm() {
-      let valid = true;
-      // Helper to show/hide errors
-      function toggleError(id, show) {
-        document.getElementById(id).classList.toggle('hidden', !show);
+    function drawLine(from, to){
+      if(!from) return;
+      ctx.beginPath();
+      ctx.moveTo(from.x, from.y);
+      ctx.lineTo(to.x, to.y);
+      ctx.stroke();
+      scratchedArea += ctx.lineWidth * 18; // estimación rápida para umbral
+    }
+
+    function startScratch(e){ isDrawing = true; lastPos = getCanvasPos(e); scratchMove(e); e.preventDefault(); }
+    function endScratch(){ isDrawing = false; lastPos = null; }
+    function scratchMove(e){
+      if(!isDrawing) return;
+      const pos = getCanvasPos(e);
+      drawLine(lastPos, pos);
+      lastPos = pos;
+      if(!isRevealed && scratchedArea/totalArea > 0.45){ reveal(); }
+      e.preventDefault();
+    }
+
+    scratchCanvas.addEventListener('mousedown', startScratch);
+    scratchCanvas.addEventListener('mousemove', scratchMove);
+    window.addEventListener('mouseup', endScratch);
+    scratchCanvas.addEventListener('touchstart', startScratch, {passive:false});
+    scratchCanvas.addEventListener('touchmove', scratchMove, {passive:false});
+    window.addEventListener('touchend', endScratch);
+
+    // ===== Sonido / confeti =====
+    function playSound(){
+      // intenta aplausos; si no hay archivo, hace beep
+      if (applauseAudio && applauseAudio.src) {
+        applauseAudio.currentTime = 0;
+        const p = applauseAudio.play();
+        if (p && p.catch) p.catch(()=>beep());
+      } else { beep(); }
+    }
+    function beep(){
+      const audioCtx = new (window.AudioContext||window.webkitAudioContext)();
+      const o = audioCtx.createOscillator();
+      const g = audioCtx.createGain();
+      o.type='triangle'; o.frequency.setValueAtTime(880,audioCtx.currentTime);
+      o.connect(g); g.connect(audioCtx.destination); g.gain.setValueAtTime(0.2,audioCtx.currentTime);
+      o.start(); o.stop(audioCtx.currentTime + 0.35);
+    }
+
+    function createConfetti(){
+      const colors = ['#CFAE63','#5D001E','#FFD700','#FFFFFF','#A67C00'];
+      const pieces = 70;
+      for(let i=0;i<pieces;i++){
+        const c = document.createElement('div');
+        c.className = 'confetti-piece';
+        c.style.left = (window.innerWidth*0.25 + Math.random()*window.innerWidth*0.5)+'px';
+        c.style.top = (window.innerHeight*0.2)+'px';
+        c.style.backgroundColor = colors[(Math.random()*colors.length)|0];
+        scratchCardContainer.appendChild(c);
+        gsap.fromTo(c,
+          {y:-20, rotate:Math.random()*360, opacity:1, scale:gsap.utils.random(0.8,1.2)},
+          {y: gsap.utils.random(500,900), x: gsap.utils.random(-220,220),
+           rotate: "+=" + gsap.utils.random(360,1080),
+           duration: gsap.utils.random(1.8,2.8), ease:"power2.out",
+           onComplete: ()=>c.remove()});
       }
+    }
+
+    function reveal(){
+      isRevealed = true;
+      ctx.clearRect(0,0,scratchCanvas.width,scratchCanvas.height);
+      ctx.globalCompositeOperation = 'source-over';
+      gsap.to('#prizeText',{opacity:1, duration:.15});
+      gsap.fromTo('#prizeText',{scale:0.6},{scale:1.05, duration:.45, ease:'back.out(1.7)'}).then(()=>{
+        gsap.to('#prizeText',{scale:1, duration:.2});
+      });
+      playSound();
+      createConfetti();
+      // Cerrar automático tras 5s (si no cierra manualmente)
+      setTimeout(()=>{ if (scratchCardContainer.style.display!=='none') closeOverlay(); }, 5000);
+    }
+
+    // ===== Validaciones =====
+    function toggleError(id, show){ document.getElementById(id).classList.toggle('hidden', !show); }
+    function validateForm(){
+      let valid = true;
       const name = form.name.value.trim();
       const email = form.email.value.trim();
       const phone = form.phone.value.trim();
@@ -249,148 +296,87 @@
       const career = form.career.value.trim();
       const university = form.university.value.trim();
       const service = form.service.value;
-      // Validate name
-      if (!name) { toggleError('nameError', true); valid = false; } else { toggleError('nameError', false); }
-      // Validate email with simple regex
+
+      if (!name) { toggleError('nameError', true); valid = false; } else toggleError('nameError', false);
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailRegex.test(email)) { toggleError('emailError', true); valid = false; } else { toggleError('emailError', false); }
-      // Validate phone: 9 digits
-      if (!/^\d{9}$/.test(phone)) { toggleError('phoneError', true); valid = false; } else { toggleError('phoneError', false); }
-      // Validate level
-      if (!level) { toggleError('levelError', true); valid = false; } else { toggleError('levelError', false); }
-      // Validate career
-      if (!career) { toggleError('careerError', true); valid = false; } else { toggleError('careerError', false); }
-      // Validate university
-      if (!university) { toggleError('universityError', true); valid = false; } else { toggleError('universityError', false); }
-      // Validate service
-      if (!service) { toggleError('serviceError', true); valid = false; } else { toggleError('serviceError', false); }
+      if (!emailRegex.test(email)) { toggleError('emailError', true); valid = false; } else toggleError('emailError', false);
+      if (!/^\d{9}$/.test(phone)) { toggleError('phoneError', true); valid = false; } else toggleError('phoneError', false);
+      if (!level) { toggleError('levelError', true); valid = false; } else toggleError('levelError', false);
+      if (!career) { toggleError('careerError', true); valid = false; } else toggleError('careerError', false);
+      if (!university) { toggleError('universityError', true); valid = false; } else toggleError('universityError', false);
+      if (!service) { toggleError('serviceError', true); valid = false; } else toggleError('serviceError', false);
       return valid;
     }
 
-    form.addEventListener('submit', function(event) {
+    // Anti-duplicados (cliente)
+    function localDuplicate(email, phone){
+      const e = localStorage.getItem('ak-email');
+      const p = localStorage.getItem('ak-phone');
+      return (e && e===email) || (p && p===phone);
+    }
+
+    // Anti-duplicados (servidor) – requiere doGet en tu Apps Script (abajo te lo dejo)
+    async function serverDuplicate(email, phone){
+      try{
+        const url = new URL(scriptURL);
+        url.searchParams.set('check', '1');
+        url.searchParams.set('email', email);
+        url.searchParams.set('phone', phone);
+        const r = await fetch(url.toString(), {method:'GET'});
+        if(!r.ok) return false;
+        const data = await r.json();
+        return !!data.duplicate;
+      }catch(_){ return false; }
+    }
+
+    // Submit
+    form.addEventListener('submit', async function(event) {
       event.preventDefault();
       if (!validateForm()) return;
 
-      // Check if email or phone were already used in this browser. If so, prevent new entry.
-      const email = form.email.value.trim();
-      const phone = form.phone.value.trim();
-      if (usedEmails.includes(email) || usedPhones.includes(phone)) {
-        alert('Este correo electrónico o número de celular ya fue registrado desde este navegador. Por favor utiliza datos diferentes.');
-        return;
-      }
-      // Choose prize
       const prize = getRandomPrize();
       prizeText.textContent = prize;
 
-      // Prepare payload
       const formData = {
         name: form.name.value.trim(),
-        email: email,
-        phone: phone,
+        email: form.email.value.trim(),
+        phone: form.phone.value.trim(),
         level: form.level.value,
         career: form.career.value.trim(),
         university: form.university.value.trim(),
         service: form.service.value,
-        prize: prize
+        prize
       };
-      // Send to Google Sheets
+
+      // Anti-duplicados
+      if (localDuplicate(formData.email, formData.phone)) {
+        alert('Ya participaste con este correo o número desde este dispositivo.');
+        return;
+      }
+      if (await serverDuplicate(formData.email, formData.phone)) {
+        alert('Ese correo o número ya participó.');
+        return;
+      }
+
+      // Mostrar modal y preparar canvas
+      initScratchCard();
+      openOverlay();
+
+      // Enviar a Sheets
       fetch(scriptURL, {
         method: 'POST',
         mode: 'no-cors',
-        // Use text/plain to avoid CORS preflight; Apps Script will still parse JSON
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
         body: JSON.stringify(formData)
-      }).catch(err => console.error('Error sending data to Sheets:', err));
+      }).catch(err => console.error('Error Sheets:', err));
 
-      // Update localStorage lists to prevent duplicates from this browser
-      usedEmails.push(email);
-      usedPhones.push(phone);
-      localStorage.setItem('usedEmails', JSON.stringify(usedEmails));
-      localStorage.setItem('usedPhones', JSON.stringify(usedPhones));
-
-      // Show scratch card
-      scratchCardContainer.style.display = 'flex';
-      initScratchCard();
+      // Persistimos localmente
+      localStorage.setItem('ak-email', formData.email);
+      localStorage.setItem('ak-phone', formData.phone);
     });
 
-    // Scratch card events
-    function getCanvasPos(e) {
-      const rect = scratchCanvas.getBoundingClientRect();
-      const x = (e.touches ? e.touches[0].clientX : e.clientX) - rect.left;
-      const y = (e.touches ? e.touches[0].clientY : e.clientY) - rect.top;
-      return { x, y };
-    }
-
-    scratchCanvas.addEventListener('mousedown', e => { isDrawing = true; scratch(e); });
-    scratchCanvas.addEventListener('touchstart', e => { isDrawing = true; scratch(e); });
-    window.addEventListener('mouseup', () => { isDrawing = false; });
-    window.addEventListener('touchend', () => { isDrawing = false; });
-    scratchCanvas.addEventListener('mousemove', e => { if (isDrawing) scratch(e); });
-    scratchCanvas.addEventListener('touchmove', e => { if (isDrawing) scratch(e); });
-
-    function scratch(e) {
-      const pos = getCanvasPos(e);
-      ctx.beginPath();
-      ctx.arc(pos.x, pos.y, 15, 0, Math.PI * 2);
-      ctx.fill();
-      // Update scratched area estimate
-      scratchedArea += Math.PI * 15 * 15;
-      // If enough area is scratched and not yet revealed
-      if (!isRevealed && scratchedArea / totalArea > 0.45) {
-        isRevealed = true;
-        // Clear overlay
-        ctx.clearRect(0, 0, scratchCanvas.width, scratchCanvas.height);
-        ctx.globalCompositeOperation = 'source-over';
-        // Show prize text
-        prizeText.style.opacity = 1;
-        // Play victory sound
-        playSound();
-        // Launch confetti animation
-        createConfetti();
-        // Hide scratch card after some seconds
-        setTimeout(() => {
-          scratchCardContainer.style.display = 'none';
-        }, 5000);
-      }
-    }
-
-    // Play a simple victory sound using Web Audio API
-    function playSound() {
-      const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-      const oscillator = audioCtx.createOscillator();
-      oscillator.type = 'triangle';
-      oscillator.frequency.setValueAtTime(523.25, audioCtx.currentTime); // C5 note
-      oscillator.connect(audioCtx.destination);
-      oscillator.start();
-      oscillator.stop(audioCtx.currentTime + 0.4);
-    }
-
-    // Create confetti pieces falling animation
-    function createConfetti() {
-      const colors = ['#CFAE63', '#5D001E', '#FFD700', '#FFFFFF'];
-      const pieces = 50; // reduce number of pieces to improve performance
-      for (let i = 0; i < pieces; i++) {
-        const confetti = document.createElement('div');
-        confetti.className = 'confetti-piece';
-        confetti.style.left = Math.random() * 100 + '%';
-        confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
-        confetti.style.animationDelay = (Math.random() * 1.5) + 's';
-        confetti.style.transform = `rotate(${Math.random() * 360}deg)`;
-        scratchCardContainer.appendChild(confetti);
-        // Remove confetti after animation ends
-        confetti.addEventListener('animationend', () => confetti.remove());
-      }
-    }
-
-    // Initialize scratch card when page loads
+    // Iniciar canvas al cargar
     window.addEventListener('load', initScratchCard);
-
-    // Close button handler: hide overlay and clean up confetti elements
-    closeScratchButton.addEventListener('click', () => {
-      scratchCardContainer.style.display = 'none';
-      // Remove any remaining confetti pieces when closing
-      document.querySelectorAll('.confetti-piece').forEach(elem => elem.remove());
-    });
   </script>
 </body>
 </html>
