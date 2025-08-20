@@ -36,7 +36,8 @@
   <div id="root" class="w-full"></div>
 
   <!-- Usamos el tipo text/babel para que Babel compile el JSX en este script -->
-  <script type="text/babel">
+  <!-- Usamos Babel para compilar JSX. Especificamos los presets de entorno y React -->
+  <script type="text/babel" data-presets="env,react">
     const { useState, useRef, useEffect } = React;
     const { motion } = window['framer-motion'];
 
