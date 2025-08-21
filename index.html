@@ -278,10 +278,19 @@
         url.searchParams.set('check', '1');
         url.searchParams.set('email', email);
         url.searchParams.set('phone', normalizePhone(phone));
-        const r = await fetch(url.toString(), {method:'GET'});
-        if(!r.ok) return false; const data = await r.json();
-        return !!data.duplicate;
-      }catch(_){ return false; }
+        const r = await fetch(url.toString(), {method:'GET', mode:'cors'});
+        if(!r.ok) return false;
+        try{
+          const data = await r.json();
+          return !!data.duplicate;
+        }catch(_){
+          alert('Fallo al verificar duplicados: respuesta no válida.');
+          return false;
+        }
+      }catch(_){
+        alert('Error al verificar duplicados.');
+        return false;
+      }
     }
 
     form.addEventListener('submit', async function(event) {
