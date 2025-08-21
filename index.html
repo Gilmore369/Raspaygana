@@ -278,10 +278,15 @@
         url.searchParams.set('check', '1');
         url.searchParams.set('email', email);
         url.searchParams.set('phone', normalizePhone(phone));
-        const r = await fetch(url.toString(), {method:'GET'});
-        if(!r.ok) return false; const data = await r.json();
+        const r = await fetch(url.toString(), {method:'GET', mode:'cors'});
+        if(!r.ok) throw new Error('Network response was not ok');
+        const data = await r.json();
         return !!data.duplicate;
-      }catch(_){ return false; }
+      }catch(err){
+        console.error('Error checking duplicate:', err);
+        alert('No se pudo verificar si ya participaste. Inténtalo más tarde.');
+        return false;
+      }
     }
 
     form.addEventListener('submit', async function(event) {
@@ -304,10 +309,24 @@
 
       initScratchCard(); openOverlay();
 
-      fetch(scriptURL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(formData) }).catch(err => console.error('Error Sheets:', err));
-
-      localStorage.setItem('ak-email', formData.email);
-      localStorage.setItem('ak-phone', formData.phone);
+      try {
+        const response = await fetch(scriptURL, {
+          method: 'POST',
+          mode: 'cors',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(formData)
+        });
+        if (response.ok) {
+          alert('Registro exitoso');
+          localStorage.setItem('ak-email', formData.email);
+          localStorage.setItem('ak-phone', formData.phone);
+        } else {
+          alert('Error al registrar. Inténtalo nuevamente.');
+        }
+      } catch (err) {
+        console.error('Error Sheets:', err);
+        alert('Error de red al registrar.');
+      }
     });
 
     window.addEventListener('load', initScratchCard);
