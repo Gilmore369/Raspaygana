@@ -304,7 +304,23 @@
 
       initScratchCard(); openOverlay();
 
-      fetch(scriptURL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(formData) }).catch(err => console.error('Error Sheets:', err));
+      try {
+        const response = await fetch(scriptURL, {
+          method: 'POST',
+          mode: 'cors',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(formData)
+        });
+        if (response.ok) {
+          console.log('Datos enviados correctamente');
+        } else {
+          console.error('Error Sheets:', response.statusText);
+          alert('Error al enviar los datos');
+        }
+      } catch (err) {
+        console.error('Error Sheets:', err);
+        alert('Error al enviar los datos');
+      }
 
       localStorage.setItem('ak-email', formData.email);
       localStorage.setItem('ak-phone', formData.phone);
