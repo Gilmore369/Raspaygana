@@ -26,9 +26,11 @@
       position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
       font-size: 2rem; font-weight: 800; color: var(--color-vino); text-align: center; opacity: 0;
       padding: .5rem;
+      /* FIX: no bloquear eventos del canvas al rascar */
+      pointer-events: none;
     }
 
-    /* Confeti (GSAP animará transform/opacity/translate) */
+    /* Confeti */
     .confetti-piece {
       position: absolute; width: 8px; height: 12px; border-radius: 2px; will-change: transform, opacity;
     }
@@ -143,12 +145,11 @@
     </div>
   </div>
 
-  <!-- Audio de aplausos (sube aplausos.mp3 a tu repo). Si no existe, habrá beep de respaldo. -->
+  <!-- Audio de aplausos -->
   <audio id="aplausos" src="aplausos.mp3" preload="auto"></audio>
 
   <script>
-    // URL de Apps Script (tu /exec actual)
-    const scriptURL = 'https://script.google.com/macros/s/AKfycbz8kDdGXgsm8V_cREA6rT-4YHkxA6A7we8xt1PO2entWAsqC3VEx2hQJivVKo5V301UOA/exec';
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbxES1juc38OMrdfogdZxRNA-ssGYpgWqtCIko_fjdi9WvvrRviYqkgWqC3iksB0XI5mww/exec';
 
     const form = document.getElementById('registrationForm');
     const scratchCardContainer = document.getElementById('scratchCardContainer');
@@ -157,7 +158,6 @@
     const closeBtn = document.getElementById('closeScratchButton');
     const applauseAudio = document.getElementById('aplausos');
 
-    // Estado
     let ctx, isDrawing = false, scratchedArea = 0, totalArea, isRevealed = false, lastPos = null;
 
     const prizes = [
@@ -165,9 +165,8 @@
       'Asesoría gratis de 30 minutos','Plantilla premium de tesis gratis',
       '25% de descuento en un servicio completo'
     ];
-    function getRandomPrize(){ return prizes[Math.floor(Math.random()*prizes.length)]; }
+    const getRandomPrize = () => prizes[Math.floor(Math.random()*prizes.length)];
 
-    // ===== Animaciones GSAP =====
     function openOverlay(){
       scratchCardContainer.style.display = 'flex';
       gsap.fromTo('#scratchCardContainer',{opacity:0},{opacity:1,duration:0.25,ease:'power1.out'});
@@ -178,22 +177,20 @@
         .to('#modalCard',{y:20,scale:.98,opacity:0,duration:.2,ease:'power2.in'})
         .to('#scratchCardContainer',{opacity:0,duration:.2,onComplete:()=>{
           scratchCardContainer.style.display='none';
-          // limpiar confeti remanente
           document.querySelectorAll('.confetti-piece').forEach(el=>el.remove());
         }});
     }
     closeBtn.addEventListener('click', closeOverlay);
 
-    // ===== Scratch optimizado (líneas, menos lag) =====
     function initScratchCard(){
       ctx = scratchCanvas.getContext('2d',{willReadFrequently:false});
       ctx.globalCompositeOperation = 'source-over';
       ctx.fillStyle = '#B0B0B0';
       ctx.fillRect(0,0,scratchCanvas.width,scratchCanvas.height);
-      ctx.globalCompositeOperation = 'destination-out'; // lo que pintes, “borra”
+      ctx.globalCompositeOperation = 'destination-out';
       ctx.lineCap = 'round';
       ctx.lineJoin = 'round';
-      ctx.lineWidth = 28; // trazo ancho = menos llamadas
+      ctx.lineWidth = 28;
       scratchedArea = 0;
       totalArea = scratchCanvas.width * scratchCanvas.height;
       isRevealed = false;
@@ -206,16 +203,14 @@
       const p = e.touches ? e.touches[0] : e;
       return { x: p.clientX - rect.left, y: p.clientY - rect.top };
     }
-
     function drawLine(from, to){
       if(!from) return;
       ctx.beginPath();
       ctx.moveTo(from.x, from.y);
       ctx.lineTo(to.x, to.y);
       ctx.stroke();
-      scratchedArea += ctx.lineWidth * 18; // estimación rápida para umbral
+      scratchedArea += ctx.lineWidth * 18;
     }
-
     function startScratch(e){ isDrawing = true; lastPos = getCanvasPos(e); scratchMove(e); e.preventDefault(); }
     function endScratch(){ isDrawing = false; lastPos = null; }
     function scratchMove(e){
@@ -234,9 +229,7 @@
     scratchCanvas.addEventListener('touchmove', scratchMove, {passive:false});
     window.addEventListener('touchend', endScratch);
 
-    // ===== Sonido / confeti =====
     function playSound(){
-      // intenta aplausos; si no hay archivo, hace beep
       if (applauseAudio && applauseAudio.src) {
         applauseAudio.currentTime = 0;
         const p = applauseAudio.play();
@@ -281,11 +274,9 @@
       });
       playSound();
       createConfetti();
-      // Cerrar automático tras 5s (si no cierra manualmente)
       setTimeout(()=>{ if (scratchCardContainer.style.display!=='none') closeOverlay(); }, 5000);
     }
 
-    // ===== Validaciones =====
     function toggleError(id, show){ document.getElementById(id).classList.toggle('hidden', !show); }
     function validateForm(){
       let valid = true;
@@ -308,14 +299,11 @@
       return valid;
     }
 
-    // Anti-duplicados (cliente)
     function localDuplicate(email, phone){
       const e = localStorage.getItem('ak-email');
       const p = localStorage.getItem('ak-phone');
       return (e && e===email) || (p && p===phone);
     }
-
-    // Anti-duplicados (servidor) – requiere doGet en tu Apps Script (abajo te lo dejo)
     async function serverDuplicate(email, phone){
       try{
         const url = new URL(scriptURL);
@@ -329,7 +317,6 @@
       }catch(_){ return false; }
     }
 
-    // Submit
     form.addEventListener('submit', async function(event) {
       event.preventDefault();
       if (!validateForm()) return;
@@ -348,7 +335,6 @@
         prize
       };
 
-      // Anti-duplicados
       if (localDuplicate(formData.email, formData.phone)) {
         alert('Ya participaste con este correo o número desde este dispositivo.');
         return;
@@ -358,11 +344,9 @@
         return;
       }
 
-      // Mostrar modal y preparar canvas
       initScratchCard();
       openOverlay();
 
-      // Enviar a Sheets
       fetch(scriptURL, {
         method: 'POST',
         mode: 'no-cors',
@@ -370,12 +354,10 @@
         body: JSON.stringify(formData)
       }).catch(err => console.error('Error Sheets:', err));
 
-      // Persistimos localmente
       localStorage.setItem('ak-email', formData.email);
       localStorage.setItem('ak-phone', formData.phone);
     });
 
-    // Iniciar canvas al cargar
     window.addEventListener('load', initScratchCard);
   </script>
 </body>
