@@ -4,41 +4,23 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Landing page AKADEMICO</title>
-
   <!-- Tailwind CSS via CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
-
   <!-- GSAP -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" referrerpolicy="no-referrer"></script>
-
   <style>
     :root { --color-vino:#5D001E; --color-dorado:#CFAE63; --color-negro:#0A0A0A; }
     body { background-color: var(--color-negro); color: white; }
-
     /* Overlay scratch */
-    #scratchCardContainer {
-      display: none; position: fixed; inset: 0;
-      background: rgba(0,0,0,0.8); align-items: center; justify-content: center; z-index: 50;
-    }
+    #scratchCardContainer { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); align-items: center; justify-content: center; z-index: 50; }
     #modalCard { position: relative; }
     #scratchCanvas { background-color: #b8b8b8; border-radius: 12px; touch-action: none; }
-    #prizeText {
-      position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
-      font-size: 2rem; font-weight: 800; color: var(--color-vino); text-align: center; opacity: 0;
-      padding: .5rem;
-      /* FIX: no bloquear eventos del canvas al rascar */
-      pointer-events: none;
-    }
-
-    /* Confeti */
-    .confetti-piece {
-      position: absolute; width: 8px; height: 12px; border-radius: 2px; will-change: transform, opacity;
-    }
+    #prizeText { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 2rem; font-weight: 800; color: var(--color-vino); text-align: center; opacity: 0; padding: .5rem; pointer-events: none; }
+    .confetti-piece { position: absolute; width: 8px; height: 12px; border-radius: 2px; will-change: transform, opacity; }
   </style>
 </head>
 <body class="antialiased font-sans">
   <div class="min-h-screen flex flex-col justify-between">
-    <!-- Header -->
     <header class="py-8 px-4 text-center bg-[var(--color-vino)]">
       <h1 class="text-3xl md:text-4xl font-extrabold text-[var(--color-dorado)]">¡Participa en el Raspa y Gana AKADEMICO y descubre tu premio!</h1>
       <p class="mt-2 text-lg md:text-xl text-white">Regístrate, raspa y obtén descuentos o beneficios exclusivos en nuestros servicios académicos.</p>
@@ -46,7 +28,6 @@
 
     <main class="flex-grow p-4 md:p-8">
       <div class="max-w-4xl mx-auto grid lg:grid-cols-2 gap-8">
-        <!-- Formulario -->
         <section class="bg-white rounded-lg shadow-lg p-6 text-gray-900">
           <h2 class="text-xl font-bold mb-4">Regístrate para participar</h2>
           <form id="registrationForm" class="space-y-4">
@@ -62,7 +43,7 @@
             </div>
             <div>
               <label for="phone" class="block text-sm font-medium text-gray-700">Número de celular</label>
-              <input type="tel" id="phone" name="phone" pattern="\d{9}" required class="mt-1 block w-full px-3 py-2 bg-gray-100 border border-gray-300 rounded-md" />
+              <input type="tel" id="phone" name="phone" inputmode="numeric" pattern="\d{9}" required class="mt-1 block w-full px-3 py-2 bg-gray-100 border border-gray-300 rounded-md" />
               <p id="phoneError" class="text-sm text-red-500 hidden">Ingresa un número de 9 dígitos.</p>
             </div>
             <div>
@@ -110,7 +91,6 @@
           </form>
         </section>
 
-        <!-- Beneficios -->
         <section class="space-y-6">
           <h2 class="text-xl font-bold">Beneficios de AKADEMICO</h2>
           <p>Acompañamiento especializado, cumplimiento estricto con normas académicas y resultados garantizados en cada entrega.</p>
@@ -125,10 +105,7 @@
       </div>
     </main>
 
-    <!-- Footer -->
-    <footer class="py-4 text-center text-sm text-gray-400 bg-[var(--color-vino)]">
-      © 2025 AKADEMICO – Todos los derechos reservados
-    </footer>
+    <footer class="py-4 text-center text-sm text-gray-400 bg-[var(--color-vino)]">© 2025 AKADEMICO – Todos los derechos reservados</footer>
   </div>
 
   <!-- Scratch card overlay -->
@@ -145,7 +122,6 @@
     </div>
   </div>
 
-  <!-- Audio de aplausos -->
   <audio id="aplausos" src="aplausos.mp3" preload="auto"></audio>
 
   <script>
@@ -160,12 +136,11 @@
 
     let ctx, isDrawing = false, scratchedArea = 0, totalArea, isRevealed = false, lastPos = null;
 
-    const prizes = [
-      '10% de descuento','15% de descuento','20% de descuento',
-      'Asesoría gratis de 30 minutos','Plantilla premium de tesis gratis',
-      '25% de descuento en un servicio completo'
-    ];
+    const prizes = ['10% de descuento','15% de descuento','20% de descuento','Asesoría gratis de 30 minutos','Plantilla premium de tesis gratis','25% de descuento en un servicio completo'];
     const getRandomPrize = () => prizes[Math.floor(Math.random()*prizes.length)];
+
+    // helpers de normalización
+    const normalizePhone = (v) => (v||'').replace(/\D/g,'');
 
     function openOverlay(){
       scratchCardContainer.style.display = 'flex';
@@ -221,7 +196,6 @@
       if(!isRevealed && scratchedArea/totalArea > 0.45){ reveal(); }
       e.preventDefault();
     }
-
     scratchCanvas.addEventListener('mousedown', startScratch);
     scratchCanvas.addEventListener('mousemove', scratchMove);
     window.addEventListener('mouseup', endScratch);
@@ -257,10 +231,7 @@
         scratchCardContainer.appendChild(c);
         gsap.fromTo(c,
           {y:-20, rotate:Math.random()*360, opacity:1, scale:gsap.utils.random(0.8,1.2)},
-          {y: gsap.utils.random(500,900), x: gsap.utils.random(-220,220),
-           rotate: "+=" + gsap.utils.random(360,1080),
-           duration: gsap.utils.random(1.8,2.8), ease:"power2.out",
-           onComplete: ()=>c.remove()});
+          {y: gsap.utils.random(500,900), x: gsap.utils.random(-220,220), rotate: "+=" + gsap.utils.random(360,1080), duration: gsap.utils.random(1.8,2.8), ease:"power2.out", onComplete: ()=>c.remove()});
       }
     }
 
@@ -269,9 +240,7 @@
       ctx.clearRect(0,0,scratchCanvas.width,scratchCanvas.height);
       ctx.globalCompositeOperation = 'source-over';
       gsap.to('#prizeText',{opacity:1, duration:.15});
-      gsap.fromTo('#prizeText',{scale:0.6},{scale:1.05, duration:.45, ease:'back.out(1.7)'}).then(()=>{
-        gsap.to('#prizeText',{scale:1, duration:.2});
-      });
+      gsap.fromTo('#prizeText',{scale:0.6},{scale:1.05, duration:.45, ease:'back.out(1.7)'}).then(()=>{ gsap.to('#prizeText',{scale:1, duration:.2}); });
       playSound();
       createConfetti();
       setTimeout(()=>{ if (scratchCardContainer.style.display!=='none') closeOverlay(); }, 5000);
@@ -282,11 +251,9 @@
       let valid = true;
       const name = form.name.value.trim();
       const email = form.email.value.trim();
-      const phone = form.phone.value.trim();
-      const level = form.level.value;
-      const career = form.career.value.trim();
-      const university = form.university.value.trim();
-      const service = form.service.value;
+      const phone = normalizePhone(form.phone.value.trim());
+      const level = form.level.value; const career = form.career.value.trim();
+      const university = form.university.value.trim(); const service = form.service.value;
 
       if (!name) { toggleError('nameError', true); valid = false; } else toggleError('nameError', false);
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -302,32 +269,29 @@
     function localDuplicate(email, phone){
       const e = localStorage.getItem('ak-email');
       const p = localStorage.getItem('ak-phone');
-      return (e && e===email) || (p && p===phone);
+      const ph = normalizePhone(phone);
+      return (e && e===email) || (p && p===ph);
     }
     async function serverDuplicate(email, phone){
       try{
         const url = new URL(scriptURL);
         url.searchParams.set('check', '1');
         url.searchParams.set('email', email);
-        url.searchParams.set('phone', phone);
+        url.searchParams.set('phone', normalizePhone(phone));
         const r = await fetch(url.toString(), {method:'GET'});
-        if(!r.ok) return false;
-        const data = await r.json();
+        if(!r.ok) return false; const data = await r.json();
         return !!data.duplicate;
       }catch(_){ return false; }
     }
 
     form.addEventListener('submit', async function(event) {
-      event.preventDefault();
-      if (!validateForm()) return;
+      event.preventDefault(); if (!validateForm()) return;
 
-      const prize = getRandomPrize();
-      prizeText.textContent = prize;
-
+      const prize = getRandomPrize(); prizeText.textContent = prize;
       const formData = {
         name: form.name.value.trim(),
         email: form.email.value.trim(),
-        phone: form.phone.value.trim(),
+        phone: normalizePhone(form.phone.value.trim()),
         level: form.level.value,
         career: form.career.value.trim(),
         university: form.university.value.trim(),
@@ -335,24 +299,12 @@
         prize
       };
 
-      if (localDuplicate(formData.email, formData.phone)) {
-        alert('Ya participaste con este correo o número desde este dispositivo.');
-        return;
-      }
-      if (await serverDuplicate(formData.email, formData.phone)) {
-        alert('Ese correo o número ya participó.');
-        return;
-      }
+      if (localDuplicate(formData.email, formData.phone)) { alert('Ya participaste con este correo o número desde este dispositivo.'); return; }
+      if (await serverDuplicate(formData.email, formData.phone)) { alert('Ese correo o número ya participó.'); return; }
 
-      initScratchCard();
-      openOverlay();
+      initScratchCard(); openOverlay();
 
-      fetch(scriptURL, {
-        method: 'POST',
-        mode: 'no-cors',
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify(formData)
-      }).catch(err => console.error('Error Sheets:', err));
+      fetch(scriptURL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(formData) }).catch(err => console.error('Error Sheets:', err));
 
       localStorage.setItem('ak-email', formData.email);
       localStorage.setItem('ak-phone', formData.phone);
