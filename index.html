@@ -139,7 +139,7 @@
     const prizes = ['10% de descuento','15% de descuento','20% de descuento','Asesoría gratis de 30 minutos','Plantilla premium de tesis gratis','25% de descuento en un servicio completo'];
     const getRandomPrize = () => prizes[Math.floor(Math.random()*prizes.length)];
 
-    // helpers de normalización
+    // helper de normalización
     const normalizePhone = (v) => (v||'').replace(/\D/g,'');
 
     function openOverlay(){
