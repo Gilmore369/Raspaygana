@@ -141,6 +141,7 @@
 
     // helpers de normalización
     const normalizePhone = (v) => (v||'').replace(/\D/g,'');
+    const normalizeEmail = (v) => (v||'').trim().toLowerCase();
 
     function openOverlay(){
       scratchCardContainer.style.display = 'flex';
@@ -250,7 +251,7 @@
     function validateForm(){
       let valid = true;
       const name = form.name.value.trim();
-      const email = form.email.value.trim();
+      const email = normalizeEmail(form.email.value);
       const phone = normalizePhone(form.phone.value.trim());
       const level = form.level.value; const career = form.career.value.trim();
       const university = form.university.value.trim(); const service = form.service.value;
@@ -269,14 +270,15 @@
     function localDuplicate(email, phone){
       const e = localStorage.getItem('ak-email');
       const p = localStorage.getItem('ak-phone');
+      const em = normalizeEmail(email);
       const ph = normalizePhone(phone);
-      return (e && e===email) || (p && p===ph);
+      return (e && e===em) || (p && p===ph);
     }
     async function serverDuplicate(email, phone){
       try{
         const url = new URL(scriptURL);
         url.searchParams.set('check', '1');
-        url.searchParams.set('email', email);
+        url.searchParams.set('email', normalizeEmail(email));
         url.searchParams.set('phone', normalizePhone(phone));
         const r = await fetch(url.toString(), {method:'GET'});
         if(!r.ok) return false; const data = await r.json();
@@ -290,7 +292,7 @@
       const prize = getRandomPrize(); prizeText.textContent = prize;
       const formData = {
         name: form.name.value.trim(),
-        email: form.email.value.trim(),
+        email: normalizeEmail(form.email.value),
         phone: normalizePhone(form.phone.value.trim()),
         level: form.level.value,
         career: form.career.value.trim(),
